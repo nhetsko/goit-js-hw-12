@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/goit-js-hw-12/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Search images</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap"
+      rel="stylesheet"
+    />
+    
+    <script type="module" crossorigin src="/goit-js-hw-12/commonHelpers.js"></script>
+    <link rel="modulepreload" crossorigin href="/goit-js-hw-12/assets/vendor-bad0427b.js">
+    <link rel="stylesheet" href="/goit-js-hw-12/assets/vendor-eb6030bc.css">
+    <link rel="stylesheet" href="/goit-js-hw-12/assets/index-88ecd6d2.css">
+  </head>
+  <body>
+    <form class="form-search">
+      <input
+        class="input-search"
+        name="search"
+        type="text"
+        placeholder="Search images..."
+      />
+      <button class="button-search search" type="submit">Search</button>
+    </form>
+    <div class="gallery-box">
+      <span class="loader"></span>
+      <ul class="gallery"></ul>
+    </div>
+    <button type="button" class="btn">Load more</button>
+    <script src="https://unpkg.com/axios/dist/axios.min.js" async></script>
+    
+  </body>
+</html>
