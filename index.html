@@ -11,32 +11,31 @@
     />
     
     <script type="module" crossorigin src="/goit-js-hw-12/commonHelpers.js"></script>
-    <link rel="modulepreload" crossorigin href="/goit-js-hw-12/assets/vendor-b41a7778.js">
+    <link rel="modulepreload" crossorigin href="/goit-js-hw-12/assets/vendor-bad0427b.js">
     <link rel="stylesheet" href="/goit-js-hw-12/assets/vendor-eb6030bc.css">
-    <link rel="stylesheet" href="/goit-js-hw-12/assets/index-88ecd6d2.css">
+    <link rel="stylesheet" href="/goit-js-hw-12/assets/index-b3fb8926.css">
   </head>
   <body>
     <form class="form-search">
       <input
-        class="input-search"
-        name="search"
+        class="picture-search-name"
         type="text"
+        name="picture-search"
         placeholder="Search images..."
       />
-      <button class="button-search search" type="submit">Search</button>
+      <button class="picture-search-button button">Search</button>
     </form>
-    <div class="gallery-box">
+
+    <div class="loader-container">
       <span class="loader"></span>
-      <ul class="gallery"></ul>
     </div>
-    <div class="container-loader">
-      <span class="loader-more"></span>
-      <p class="end-loader">
-        "We're sorry, but you've reached the end of search results."
-      </p>
-      <button class="btn-load">Load more</button>
-    </div>
-    <script src="https://unpkg.com/axios/dist/axios.min.js" async></script>
-    
+
+    <div class="gallery"></div>
+
+    <button class="load-more-button button" type="button" style="display: none">
+      Load more
+    </button>
   </body>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  
 </html>
