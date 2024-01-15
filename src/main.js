@@ -10,17 +10,62 @@ const loader = document.querySelector('.loader');
 const btnLoad = document.querySelector('.btn');
 const lightbox = new SimpleLightbox('.gallery a', { captionsData: 'alt', captionDelay: 250 });
 
+
+
+const api = axios.create({
+  baseURL: " https://pixabay.com/api/",
+  params: {
+    apiKey: "41511305-1e730bfa7be67778e89c40f75",
+    language: "en"
+  }
+});
+
+function createGalleryMarkup (pictures = []) {
+  const markup = pictures.reduce((html, {webformatURL, largeImageURL, tags, likes, views, comments, downloads}) => html + `<li class="gallery-item">
+  <a class="gallery-link" href="${largeImageURL}">
+    <img
+      class="gallery-image"
+      src="${webformatURL}"
+      alt="${tags}"
+      width="360"
+    />
+  </a>
+  <div class="thumb-block">
+    <div class="block">
+      <h2 class="tittle">Likes</h2>
+      <p class="amount">${likes}</p>
+    </div>
+    <div class="block">
+      <h2 class="tittle">Views</h2>
+      <p class="amount">${views}</p>
+    </div>
+    <div class="block">
+      <h2 class="tittle">Comments</h2>
+      <p class="amount">${comments}</p>
+    </div>
+    <div class="block">
+      <h2 class="tittle">Downloads</h2>
+      <p class="amount">${downloads}</p>
+    </div>
+  </div>
+</li>`, '');
+listImages.insertAdjacentHTML('beforeend', markup);
+}
+
+let query = '';
 let page = 1;
-let limit = 40;
+let perPage = 40;
+let totalPages = 1;
 
 formSearch.addEventListener('submit', onSearch);
 
 async function onSearch(event) {
     event.preventDefault();
-    listImages.innerHTML = " ";
-    const inputValue = event.target.elements.search.value;
+    const inputValue = event.target.elements.search.value.trim();
     loader.style.display = 'block';
-
+if(!inputValue) {
+  
+}
     try {
         const picture = await getPictures(inputValue);
         const totalPages = Math.ceil(picture.totalHits / limit);
@@ -58,7 +103,7 @@ async function getPictures(name) {
         image_type: 'photo',
         orientation: 'horizontal',
         safesearch: true,
-        per_page: limit,
+        per_page: perPage,
         page: page
     });
 
@@ -67,38 +112,6 @@ async function getPictures(name) {
     return response.data;
 }
 
-function createGalleryMarkup(picture) {
-    const markup = picture
-        .hits
-        .map(({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) =>
-            `<li class="gallery-item">
-              <a class="gallery-link" href="${largeImageURL}">
-                <img
-                  class="gallery-image"
-                  src="${webformatURL}"
-                  alt="${tags}"
-                  width="360"
-                />
-              </a>
-              <div class="thumb-block">
-                <div class="block">
-                  <h2 class="tittle">Likes</h2>
-                  <p class="amount">${likes}</p>
-                </div>
-                <div class="block">
-                  <h2 class="tittle">Views</h2>
-                  <p class="amount">${views}</p>
-                </div>
-                <div class="block">
-                  <h2 class="tittle">Comments</h2>
-                  <p class="amount">${comments}</p>
-                </div>
-                <div class="block">
-                  <h2 class="tittle">Downloads</h2>
-                  <p class="amount">${downloads}</p>
-                </div>
-              </div>
-            </li>`)
-        .join('');
-    listImages.insertAdjacentHTML('beforeend', markup);
+function clearPage () {
+  listImages.innerHTML = '';
 }
