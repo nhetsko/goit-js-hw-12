@@ -14,25 +14,24 @@
   <body>
     <form class="form-search">
       <input
-        class="input-search"
-        name="search"
+        class="picture-search-name"
         type="text"
+        name="picture-search"
         placeholder="Search images..."
       />
-      <button class="button-search search" type="submit">Search</button>
+      <button class="picture-search-button button">Search</button>
     </form>
-    <div class="gallery-box">
+
+    <div class="loader-container">
       <span class="loader"></span>
-      <ul class="gallery"></ul>
     </div>
-    <div class="container-loader">
-      <span class="loader-more"></span>
-      <p class="end-loader">
-        "We're sorry, but you've reached the end of search results."
-      </p>
-      <button class="btn-load">Load more</button>
-    </div>
-    <script src="https://unpkg.com/axios/dist/axios.min.js" async></script>
-    <script type="module" src="./main.js"></script>
+
+    <div class="gallery"></div>
+
+    <button class="load-more-button button" type="button" style="display: none">
+      Load more
+    </button>
   </body>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script type="module" src="./main.js"></script>
 </html>

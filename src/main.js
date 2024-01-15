@@ -5,136 +5,126 @@ import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 
 const formSearch = document.querySelector('.form-search');
-const listImages = document.querySelector('.gallery');
-const loader = document.querySelector('.loader');
-const btnLoad = document.querySelector('.btn-load');
+const searchInput = document.querySelector('.picture-search-name');
+const loaderContainer = document.querySelector('.loader-container');
+const loadMoreButton = document.querySelector('.load-more-button');
 const lightbox = new SimpleLightbox('.gallery a', { captionsData: 'alt', captionDelay: 250 });
 
 
 const BASE_URL = "https://pixabay.com/api/";
 const API_KEY = "41511305-1e730bfa7be67778e89c40f75";
+let currentPage = 1;
+const perPage = 40;
+let searchQuery = '';
 
-async function servicePixabay(search, page, perpage) {
-  const params = new URLSearchParams({
-   key: KEY,
-        q: search,
-        image_type: 'photo',
-        orientation: 'horizontal',
-        safesearch: true,
-        per_page: perPage,
-        page,
-  });
-
-  const response = await axios.get(`${BASE_URL}?${params}`);
-
-  return response.data;
+function showLoader() {
+  loaderContainer.style.display = 'block';
+}
+function removeLoader() {
+  loaderContainer.style.display = 'none';
 }
 
+async function searchImages(query, currentPage) {
+  searchQuery = query;
 
-function createGalleryMarkup (pictures = []) {
-  const markup = pictures.reduce((html, {webformatURL, largeImageURL, tags, likes, views, comments, downloads}) => html + `<li class="gallery-item">
-  <a class="gallery-link" href="${largeImageURL}">
-    <img
-      class="gallery-image"
-      src="${webformatURL}"
-      alt="${tags}"
-      width="360"
-    />
-  </a>
-  <div class="thumb-block">
-    <div class="block">
-      <h2 class="tittle">Likes</h2>
-      <p class="amount">${likes}</p>
-    </div>
-    <div class="block">
-      <h2 class="tittle">Views</h2>
-      <p class="amount">${views}</p>
-    </div>
-    <div class="block">
-      <h2 class="tittle">Comments</h2>
-      <p class="amount">${comments}</p>
-    </div>
-    <div class="block">
-      <h2 class="tittle">Downloads</h2>
-      <p class="amount">${downloads}</p>
-    </div>
-  </div>
-</li>`, '');
-listImages.insertAdjacentHTML('beforeend', markup);
+  const requestParams = {
+    key: API_KEY,
+    q: searchQuery,
+    image_type: 'photo',
+    orientation: 'horizontal',
+    safesearch: true,
+    page: currentPage,
+    per_page: perPage,
+  };
+
+  const searchParams = new URLSearchParams(requestParams);
+
+  showLoader();
+
+try {
+const response = await axios.get(`${BASE_URL}?${searchParams}`);
+
+removeLoader();
+
+const { hits, totalHits } = response.data;
+const gallery = document.querySelector('.gallery');
+lightbox.refresh();
+  
+if (currentPage === 1) {
+      gallery.innerHTML = '';
+}
+  
+const galleryHtml = hits.reduce(
+      (html, image) =>
+        html +
+        `<a class="gallery-link" href="${image.largeImageURL}">
+            <img
+                class="gallery-image"
+                src="${image.webformatURL}"
+                alt="${image.tags}"
+            />
+           <ul class="info-list">
+              <li class="info-item">
+                  <p class="info-title">Likes</p>
+                  <p class="info-value">${image.likes}</p>
+              </li>
+              <li class="info-item">
+                  <p class="info-title">Views</p>
+                  <p class="info-value">${image.views}</p>
+              </li>
+              <li class="info-item">
+                  <p class="info-title">Comments</p>
+                  <p class="info-value">${image.comments}</p>
+              </li>
+              <li class="info-item">
+                  <p class="info-title">Downloads</p>
+                  <p class="info-value">${image.downloads}</p>
+              </li>
+            </ul>
+        </a>`,
+      ''
+    );
+    gallery.insertAdjacentHTML('beforeend', galleryHtml);
+    lightbox.refresh();
+
+ if (currentPage * perPage >= totalHits) {
+      loadMoreButton.style.display = 'none';
+      iziToast.error({
+        title: 'Error',
+        message: "We're sorry, but you've reached the end of search results.",
+        position: 'topRight',
+      });
+    } else {
+      loadMoreButton.style.display = 'block';
+      const scrollImages = document
+        .querySelector('.gallery-link')
+        .getBoundingClientRect().height;
+      window.scrollBy({
+        top: scrollImages * 2,
+        behavior: 'smooth',
+      });
+    }
+  } catch (error) {
+    removeLoader();
+    iziToast.error({
+      title: 'Error',
+      message: error.message,
+      position: 'topRight',
+    });
+  }
 }
 
-let query = '';
-let page = 1;
-let perPage = 40;
-let totalPages = 1;
+formSearch.addEventListener('submit', event => {
+  event.preventDefault();
 
-formSearch.addEventListener('submit', onSearch);
+  const query = searchInput.value.trim();
+  currentPage = 1;
+  loadMoreButton.style.display = 'none';
+  searchImages(query, currentPage);
+  event.currentTarget.reset();
+});
 
-
-
-
-// async function onSearch(event) {
-//   event.preventDefault();
-//   const inputValue = event.target.elements.search.value.trim();
-//   loader.style.display = 'block';
-//   if (!inputValue) {
-//     iziToast.error({ message: 'Sorry, there are no images matching your search query. Please try again!' });
-//     clearPage();
-//     return;
-//   }
-//   clearPage();
-//   page = 1;
-//   query = inputValue;
-
-// }
-
-
-
-//         const picture = await getPictures(inputValue);
-//         const totalPages = Math.ceil(picture.totalHits / limit);
-
-//         if (page > totalPages) {
-//             loader.style.display = 'none';
-//             return iziToast.error({
-//                 position: "topRight",
-//                 message: "We're sorry, but you've reached the end of search results"
-//             });
-//         }
-
-//         createGalleryMarkup(picture);
-
-//         page += 1;
-
-//         if (page > 1) {
-//             btnLoad.textContent = 'Loading images, please wait...';
-//         }
-//         lightbox.refresh();
-//     } catch (error) {
-//         loader.style.display = 'none';
-//         console.log(error);
-//     }
-//     formSearch.reset();
-// }
-
-// async function getPictures(name) {
-//     const BASE_URL = 'https://pixabay.com/api/';
-//     const KEY = '41511305-1e730bfa7be67778e89c40f75';
-
-//     const searchParams = new URLSearchParams({
-//         key: KEY,
-//         q: name,
-//         image_type: 'photo',
-//         orientation: 'horizontal',
-//         safesearch: true,
-//         per_page: perPage,
-//         page: page
-//     });
-
-//     const response = await axios.get(`${BASE_URL}?${searchParams}`);
-
-//     return response.data;
-// }
-
-function clearPage () {
-  listImages.innerHTML = '';
-}
+loadMoreButton.addEventListener('click', () => {
+  currentPage += 1;
+  searchImages(searchQuery, currentPage);
+});
