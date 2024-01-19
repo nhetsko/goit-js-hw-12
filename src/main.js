@@ -91,13 +91,14 @@ const galleryHtml = hits.reduce(
       const scrollImages = document
         .querySelector('.gallery-link')
         .getBoundingClientRect().height;
-      window.scrollBy({
-        top: scrollImages * 2,
-        behavior: 'smooth',
-      });
+        window.scrollTo({
+          top: document.body.scrollHeight,
+          behavior: 'smooth',
+        });
+        
 
   } 
-
+  
   catch (error) {
     iziToast.error({
       title: 'Error',
