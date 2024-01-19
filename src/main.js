@@ -5,14 +5,13 @@ import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 
 const formSearch = document.querySelector('.form-search');
+const gallery = document.querySelector('.gallery');
 const searchInput = document.querySelector('.picture-search-name');
 const loaderContainer = document.querySelector('.loader-container');
 const loadMoreButton = document.querySelector('.load-more-button');
 const lightbox = new SimpleLightbox('.gallery a', { captionsData: 'alt', captionDelay: 250 });
 
 
-const BASE_URL = "https://pixabay.com/api/";
-const API_KEY = "41511305-1e730bfa7be67778e89c40f75";
 let currentPage = 1;
 const perPage = 40;
 let searchQuery = '';
@@ -25,7 +24,8 @@ function removeLoader() {
 }
 
 async function searchImages(query, currentPage) {
-  searchQuery = query;
+const BASE_URL = "https://pixabay.com/api/";
+const API_KEY = "41511305-1e730bfa7be67778e89c40f75";
 
   const requestParams = {
     key: API_KEY,
@@ -44,16 +44,8 @@ async function searchImages(query, currentPage) {
 try {
 const response = await axios.get(`${BASE_URL}?${searchParams}`);
 
-removeLoader();
-
 const { hits, totalHits } = response.data;
-const gallery = document.querySelector('.gallery');
-lightbox.refresh();
-  
-if (currentPage === 1) {
-      gallery.innerHTML = '';
-}
-  
+ 
 const galleryHtml = hits.reduce(
       (html, image) =>
         html +
@@ -94,7 +86,7 @@ const galleryHtml = hits.reduce(
         message: "We're sorry, but you've reached the end of search results.",
         position: 'topRight',
       });
-    } else {
+    } 
       loadMoreButton.style.display = 'block';
       const scrollImages = document
         .querySelector('.gallery-link')
@@ -103,24 +95,28 @@ const galleryHtml = hits.reduce(
         top: scrollImages * 2,
         behavior: 'smooth',
       });
-    }
-  } catch (error) {
-    removeLoader();
+
+  } 
+
+  catch (error) {
     iziToast.error({
       title: 'Error',
       message: error.message,
       position: 'topRight',
     });
   }
+  finally {
+    removeLoader();
+  }
 }
 
 formSearch.addEventListener('submit', event => {
   event.preventDefault();
-
-  const query = searchInput.value.trim();
+  gallery.innerHTML = '';
+  searchQuery = searchInput.value.trim();
   currentPage = 1;
   loadMoreButton.style.display = 'none';
-  searchImages(query, currentPage);
+  searchImages(searchQuery, currentPage);
   event.currentTarget.reset();
 });
 
