@@ -45,7 +45,16 @@ try {
 const response = await axios.get(`${BASE_URL}?${searchParams}`);
 
 const { hits, totalHits } = response.data;
- 
+if (hits.length === 0) {
+  loadMoreButton.style.display = 'none';
+  iziToast.warning({
+    title: 'Warning',
+    message: "No results found for the given query.",
+    position: 'topRight',
+  });
+  return;
+}
+
 const galleryHtml = hits.reduce(
       (html, image) =>
         html +
@@ -76,27 +85,27 @@ const galleryHtml = hits.reduce(
         </a>`,
       ''
     );
-    gallery.insertAdjacentHTML('beforeend', galleryHtml);
-    lightbox.refresh();
 
- if (currentPage * perPage >= totalHits) {
+    gallery.insertAdjacentHTML('beforeend', galleryHtml);
+
+    lightbox.refresh();
+    loadMoreButton.style.display = 'block';
+
+    const scrollImages = document
+      .querySelector('.gallery-link')
+      .getBoundingClientRect().height;
+    window.scrollBy({
+      top: scrollImages * 2,
+      behavior: 'smooth',
+    });
+    if (currentPage * perPage >= totalHits) {
       loadMoreButton.style.display = 'none';
       iziToast.error({
         title: 'Error',
         message: "We're sorry, but you've reached the end of search results.",
         position: 'topRight',
       });
-    } 
-      loadMoreButton.style.display = 'block';
-      const scrollImages = document
-        .querySelector('.gallery-link')
-        .getBoundingClientRect().height;
-        window.scrollTo({
-          top: document.body.scrollHeight,
-          behavior: 'smooth',
-        });
-        
-
+    }
   } 
   
   catch (error) {
@@ -113,7 +122,7 @@ const galleryHtml = hits.reduce(
 
 formSearch.addEventListener('submit', event => {
   event.preventDefault();
-  gallery.innerHTML = '';
+  gallery.innerHTML = ''; 
   searchQuery = searchInput.value.trim();
   currentPage = 1;
   loadMoreButton.style.display = 'none';
